@@ -13,7 +13,15 @@ import 'package:image/image.dart' as img;
 /// copy regions within the same image (if [dst] is the same as [src])
 /// but if the regions overlap the results will be unpredictable.
 img.Image drawImage(img.Image dst, img.Image src,
-    {int? dstX, int? dstY, int? dstW, int? dstH, int? srcX, int? srcY, int? srcW, int? srcH, bool blend = true}) {
+    {int? dstX,
+    int? dstY,
+    int? dstW,
+    int? dstH,
+    int? srcX,
+    int? srcY,
+    int? srcW,
+    int? srcH,
+    bool blend = true}) {
   dstX ??= 0;
   dstY ??= 0;
   srcX ??= 0;

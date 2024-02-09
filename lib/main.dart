@@ -4,22 +4,35 @@ import 'dart:io';
 
 import 'package:dart_ping_ios/dart_ping_ios.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:thermal_printer/esc_pos_utils_platform/esc_pos_utils_platform.dart';
 import 'package:thermal_printer/thermal_printer.dart';
+import 'package:thermal_printer_example/utils/database_helper.dart';
+import 'package:thermal_printer_example/utils/storage_service.dart';
 import 'package:thermal_printer_example/view/compatibility/compatibility.dart';
 
-void main() {
+Future<void> main() async {
   // Register DartPingIOS
   if (Platform.isIOS) {
     DartPingIOS.register();
   }
+  await StorageService.instance.init();
+
+  //
+
+  // Initialize the database manager
+  DatabaseManager databaseManager = DatabaseManager.instance;
+
+  // Open the database
+  databaseManager.openDatabase();
+
   runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -28,8 +41,20 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return const GetMaterialApp(
-        debugShowCheckedModeBanner: false, home: Compatibility());
+    return ScreenUtilInit(
+      minTextAdapt: true,
+      splitScreenMode: true,
+      // Use builder only if you need to use library outside ScreenUtilInit context
+      builder: (_, child) {
+        return GetMaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'First Method',
+          // You can use the library anywhere in the app even in theme
+          home: child,
+        );
+      },
+      child: const Compatibility(),
+    );
   }
 }
 
@@ -43,27 +68,42 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   // Printer Type [bluetooth, usb, network]
   var defaultPrinterType = PrinterType.bluetooth;
-  var _isBle = false;
-  var _reconnect = false;
-  var _isConnected = false;
-  var printerManager = PrinterManager.instance;
+
   var devices = <BluetoothPrinter>[];
-  StreamSubscription<PrinterDevice>? _subscription;
-  StreamSubscription<BTStatus>? _subscriptionBtStatus;
-  StreamSubscription<USBStatus>? _subscriptionUsbStatus;
-  StreamSubscription<TCPStatus>? _subscriptionTCPStatus;
-  BTStatus _currentStatus = BTStatus.none;
+  List<int>? pendingTask;
+  var printerManager = PrinterManager.instance;
+  BluetoothPrinter? selectedPrinter;
+
+  var currentStatus = BTStatus.none;
   // ignore: unused_field
   TCPStatus _currentTCPStatus = TCPStatus.none;
+
   // _currentUsbStatus is only supports on Android
   // ignore: unused_field
   USBStatus _currentUsbStatus = USBStatus.none;
-  List<int>? pendingTask;
+
   String _ipAddress = '';
-  String _port = '9100';
   final _ipController = TextEditingController();
+  var _isBle = false;
+  var _isConnected = false;
+  String _port = '9100';
   final _portController = TextEditingController();
-  BluetoothPrinter? selectedPrinter;
+  var _reconnect = false;
+  StreamSubscription<PrinterDevice>? _subscription;
+  StreamSubscription<BTStatus>? _subscriptionBtStatus;
+  StreamSubscription<TCPStatus>? _subscriptionTCPStatus;
+  StreamSubscription<USBStatus>? _subscriptionUsbStatus;
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    _subscriptionBtStatus?.cancel();
+    _subscriptionUsbStatus?.cancel();
+    _subscriptionTCPStatus?.cancel();
+    _portController.dispose();
+    _ipController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -76,7 +116,7 @@ class _HomeState extends State<Home> {
     _subscriptionBtStatus =
         PrinterManager.instance.stateBluetooth.listen((status) {
       log(' ----------------- status bt $status ------------------ ');
-      _currentStatus = status;
+      currentStatus = status;
       if (status == BTStatus.connected) {
         setState(() {
           _isConnected = true;
@@ -123,35 +163,6 @@ class _HomeState extends State<Home> {
     });
   }
 
-  @override
-  void dispose() {
-    _subscription?.cancel();
-    _subscriptionBtStatus?.cancel();
-    _subscriptionUsbStatus?.cancel();
-    _subscriptionTCPStatus?.cancel();
-    _portController.dispose();
-    _ipController.dispose();
-    super.dispose();
-  }
-
-  // method to scan devices according PrinterType
-  void _scan() {
-    devices.clear();
-    _subscription = printerManager
-        .discovery(type: defaultPrinterType, isBle: _isBle)
-        .listen((device) {
-      devices.add(BluetoothPrinter(
-        deviceName: device.name,
-        address: device.address,
-        isBle: _isBle,
-        vendorId: device.vendorId,
-        productId: device.productId,
-        typePrinter: defaultPrinterType,
-      ));
-      setState(() {});
-    });
-  }
-
   void setPort(String value) {
     if (value.isEmpty) value = '9100';
     _port = value;
@@ -189,6 +200,24 @@ class _HomeState extends State<Home> {
 
     selectedPrinter = device;
     setState(() {});
+  }
+
+  // method to scan devices according PrinterType
+  void _scan() {
+    devices.clear();
+    _subscription = printerManager
+        .discovery(type: defaultPrinterType, isBle: _isBle)
+        .listen((device) {
+      devices.add(BluetoothPrinter(
+        deviceName: device.name,
+        address: device.address,
+        isBle: _isBle,
+        vendorId: device.vendorId,
+        productId: device.productId,
+        typePrinter: defaultPrinterType,
+      ));
+      setState(() {});
+    });
   }
 
   Future _printReceiveTest() async {
@@ -332,6 +361,8 @@ class _HomeState extends State<Home> {
     bytes += generator.text(timestamp,
         styles: const PosStyles(align: PosAlign.center), linesAfter: 2);
 
+    // bytes.elementAt
+
     _printEscPos(bytes, generator);
   }
 
@@ -357,13 +388,15 @@ class _HomeState extends State<Home> {
         break;
       case PrinterType.bluetooth:
         bytes += generator.cut();
-        await printerManager.connect(
+        final res = await printerManager.connect(
             type: bluetoothPrinter.typePrinter,
             model: BluetoothPrinterInput(
                 name: bluetoothPrinter.deviceName,
                 address: bluetoothPrinter.address!,
                 isBle: bluetoothPrinter.isBle ?? false,
                 autoConnect: _reconnect));
+
+        log('bl status--->$res');
         pendingTask = null;
         if (Platform.isAndroid) pendingTask = bytes;
         break;
@@ -377,15 +410,12 @@ class _HomeState extends State<Home> {
         break;
       default:
     }
-    if (bluetoothPrinter.typePrinter == PrinterType.bluetooth &&
-        Platform.isAndroid) {
-      if (_currentStatus == BTStatus.connected) {
-        printerManager.send(type: bluetoothPrinter.typePrinter, bytes: bytes);
-        pendingTask = null;
-      }
-    } else {
-      printerManager.send(type: bluetoothPrinter.typePrinter, bytes: bytes);
-    }
+
+    log('entry 3---> printer ');
+    final dt = await printerManager.send(
+        type: bluetoothPrinter.typePrinter, bytes: bytes);
+
+    log('entry 4---> printer executed at the status of $dt  ');
   }
 
   // conectar dispositivo
@@ -677,17 +707,6 @@ class _HomeState extends State<Home> {
 }
 
 class BluetoothPrinter {
-  int? id;
-  String? deviceName;
-  String? address;
-  String? port;
-  String? vendorId;
-  String? productId;
-  bool? isBle;
-
-  PrinterType typePrinter;
-  bool? state;
-
   BluetoothPrinter(
       {this.deviceName,
       this.address,
@@ -697,4 +716,14 @@ class BluetoothPrinter {
       this.productId,
       this.typePrinter = PrinterType.bluetooth,
       this.isBle = false});
+
+  String? address;
+  String? deviceName;
+  int? id;
+  bool? isBle;
+  String? port;
+  String? productId;
+  bool? state;
+  PrinterType typePrinter;
+  String? vendorId;
 }

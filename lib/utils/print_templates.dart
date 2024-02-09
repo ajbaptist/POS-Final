@@ -1,8 +1,10 @@
 import 'package:intl/intl.dart';
 import 'package:thermal_printer/esc_pos_utils_platform/esc_pos_utils_platform.dart';
+import 'package:thermal_printer_example/model/data_model.dart';
 
 class Templates {
-  static Future<List<int>> template1() async {
+  static Future<List<int>> template1({required List<DataModel> data}) async {
+    
     List<int> bytes = [];
 
     // Xprinter XP-N160I
@@ -35,102 +37,48 @@ class Templates {
           width: 1,
           styles: const PosStyles(align: PosAlign.left, bold: true)),
       PosColumn(
-          text: 'Item',
+          text: 'Name',
           width: 5,
           styles: const PosStyles(align: PosAlign.left, bold: true)),
       PosColumn(
-          text: 'Price',
+          text: 'Date',
           width: 2,
           styles: const PosStyles(align: PosAlign.center, bold: true)),
       PosColumn(
-          text: 'Qty',
+          text: 'Month',
           width: 2,
           styles: const PosStyles(align: PosAlign.center, bold: true)),
       PosColumn(
-          text: 'Total',
+          text: 'Year',
           width: 2,
           styles: const PosStyles(align: PosAlign.right, bold: true)),
     ]);
 
-    bytes += generator.row([
-      PosColumn(text: "1", width: 1),
-      PosColumn(
-          text: "Test Item 1",
-          width: 5,
-          styles: const PosStyles(
-            align: PosAlign.left,
-          )),
-      PosColumn(
-          text: "10",
-          width: 2,
-          styles: const PosStyles(
-            align: PosAlign.center,
-          )),
-      PosColumn(
-          text: "1", width: 2, styles: const PosStyles(align: PosAlign.center)),
-      PosColumn(
-          text: "10", width: 2, styles: const PosStyles(align: PosAlign.right)),
-    ]);
-
-    bytes += generator.row([
-      PosColumn(text: "2", width: 1),
-      PosColumn(
-          text: "Test Item 2",
-          width: 5,
-          styles: const PosStyles(
-            align: PosAlign.left,
-          )),
-      PosColumn(
-          text: "30",
-          width: 2,
-          styles: const PosStyles(
-            align: PosAlign.center,
-          )),
-      PosColumn(
-          text: "1", width: 2, styles: const PosStyles(align: PosAlign.center)),
-      PosColumn(
-          text: "30", width: 2, styles: const PosStyles(align: PosAlign.right)),
-    ]);
-
-    bytes += generator.row([
-      PosColumn(text: "3", width: 1),
-      PosColumn(
-          text: "Test Item 3",
-          width: 5,
-          styles: const PosStyles(
-            align: PosAlign.left,
-          )),
-      PosColumn(
-          text: "50",
-          width: 2,
-          styles: const PosStyles(
-            align: PosAlign.center,
-          )),
-      PosColumn(
-          text: "1", width: 2, styles: const PosStyles(align: PosAlign.center)),
-      PosColumn(
-          text: "50", width: 2, styles: const PosStyles(align: PosAlign.right)),
-    ]);
-
-    bytes += generator.row([
-      PosColumn(text: "4", width: 1),
-      PosColumn(
-          text: "Test Item 4",
-          width: 5,
-          styles: const PosStyles(
-            align: PosAlign.left,
-          )),
-      PosColumn(
-          text: "70",
-          width: 2,
-          styles: const PosStyles(
-            align: PosAlign.center,
-          )),
-      PosColumn(
-          text: "1", width: 2, styles: const PosStyles(align: PosAlign.center)),
-      PosColumn(
-          text: "70", width: 2, styles: const PosStyles(align: PosAlign.right)),
-    ]);
+    for (var e in data) {
+      bytes += generator.row([
+        PosColumn(text: (1 + data.indexOf(e)).toString(), width: 1),
+        PosColumn(
+            text: e.name,
+            width: 5,
+            styles: const PosStyles(
+              align: PosAlign.left,
+            )),
+        PosColumn(
+            text: e.date.toString(),
+            width: 2,
+            styles: const PosStyles(
+              align: PosAlign.center,
+            )),
+        PosColumn(
+            text: e.month.toString(),
+            width: 2,
+            styles: const PosStyles(align: PosAlign.center)),
+        PosColumn(
+            text: e.year.toString(),
+            width: 2,
+            styles: const PosStyles(align: PosAlign.right)),
+      ]);
+    }
 
     bytes += generator.hr();
 
