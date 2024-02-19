@@ -8,7 +8,7 @@ class DbConstants {
 
   static const histroy = 'PrintingHistory';
 
-  static const String databaseName = '/pos.db';
+  static const String databaseName = 'pos.db';
   static const String tableName = 'data_table';
   static const String histroyTableName = 'history_table';
 }

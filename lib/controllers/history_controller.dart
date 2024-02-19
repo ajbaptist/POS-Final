@@ -1,10 +1,13 @@
+import 'package:flutter/foundation.dart';
 import 'package:get/state_manager.dart';
 import 'package:thermal_printer_example/model/history_model.dart';
 import 'package:thermal_printer_example/utils/database_helper.dart';
 
 class PrintingHistoryController extends GetxController {
   var historyData = <HistroyModel>[
-    HistroyModel(name: DateTime.now(), printerName: 'printerName')
+    HistroyModel(
+        name: DateTime.now(),
+        printerName: 'printer Name Example Demo For Testing Application')
   ].obs;
 
   getPrinterData() async {
@@ -14,7 +17,9 @@ class PrintingHistoryController extends GetxController {
         historyData.value = data;
       }
     } catch (e) {
-      print('Error fetching data: $e');
+      if (kDebugMode) {
+        print('Error fetching data: $e');
+      }
     }
   }
 

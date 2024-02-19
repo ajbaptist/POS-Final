@@ -1,6 +1,8 @@
 // lib/database_manager.dart
+import 'dart:developer';
 import 'dart:io';
 
+import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/sqlite3.dart';
 import 'package:thermal_printer_example/model/data_model.dart';
@@ -17,16 +19,17 @@ class DatabaseManager {
   DatabaseManager._internal();
 
   // Getter for the singleton instance
-  static DatabaseManager get instance => _singleton;
+  static DatabaseManager get instance {
+    return _singleton;
+  }
+
+  // Initialize the database and create tables
 
   // Open the database
-  void openDatabase() async {
-    final Directory doc = await getApplicationDocumentsDirectory();
-    var path = doc.parent.path;
-
-    final value = '$path${DbConstants.databaseName}';
-
-    _database = sqlite3.open(value);
+  Future<void> openDatabase() async {
+    Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    String path = join(documentsDirectory.path, DbConstants.databaseName);
+    _database = sqlite3.open(path);
   }
 
   // Close the database
@@ -81,6 +84,7 @@ class DatabaseManager {
 
       return res.map((data) => DataModel.fromJson(data)).toList();
     } catch (e) {
+      log('er---->$e');
       return [];
     }
   }

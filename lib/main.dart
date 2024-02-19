@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:dart_ping_ios/dart_ping_ios.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -10,23 +11,19 @@ import 'package:intl/intl.dart';
 import 'package:thermal_printer/esc_pos_utils_platform/esc_pos_utils_platform.dart';
 import 'package:thermal_printer/thermal_printer.dart';
 import 'package:thermal_printer_example/utils/database_helper.dart';
-import 'package:thermal_printer_example/utils/storage_service.dart';
 import 'package:thermal_printer_example/view/compatibility/compatibility.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   // Register DartPingIOS
   if (Platform.isIOS) {
     DartPingIOS.register();
   }
-  await StorageService.instance.init();
-
   //
 
-  // Initialize the database manager
-  DatabaseManager databaseManager = DatabaseManager.instance;
+  await DatabaseManager.instance.openDatabase();
 
   // Open the database
-  databaseManager.openDatabase();
 
   runApp(const MyApp());
 }
@@ -406,7 +403,11 @@ class _HomeState extends State<Home> {
         connectedTCP = await printerManager.connect(
             type: bluetoothPrinter.typePrinter,
             model: TcpPrinterInput(ipAddress: bluetoothPrinter.address!));
-        if (!connectedTCP) print(' --- please review your connection ---');
+        if (!connectedTCP) {
+          if (kDebugMode) {
+            print(' --- please review your connection ---');
+          }
+        }
         break;
       default:
     }

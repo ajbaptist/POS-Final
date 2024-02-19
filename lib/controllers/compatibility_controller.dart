@@ -7,9 +7,7 @@ import 'package:thermal_printer_example/main.dart';
 import 'package:thermal_printer_example/model/data_model.dart';
 import 'package:thermal_printer_example/model/history_model.dart';
 import 'package:thermal_printer_example/utils/database_helper.dart';
-import 'package:thermal_printer_example/utils/db_constant.dart';
 import 'package:thermal_printer_example/utils/print_templates.dart';
-import 'package:thermal_printer_example/utils/storage_service.dart';
 
 class CompatibilityController extends GetxController {
   @override
@@ -109,10 +107,6 @@ class CompatibilityController extends GetxController {
     userData.add(data);
 
     DatabaseManager.instance.insertData(data);
-
-    var res = userData.map((element) => element.toJson()).toList();
-
-    StorageService.instance.writeData(DbConstants.usersData, res);
   }
 
   writeTableData(HistroyModel data) {

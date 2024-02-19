@@ -4,6 +4,24 @@ PODS:
     - Flutter
   - network_info_plus (0.0.1):
     - Flutter
+  - path_provider_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
+  - sqlite3 (3.45.1):
+    - sqlite3/common (= 3.45.1)
+  - sqlite3/common (3.45.1)
+  - sqlite3/fts5 (3.45.1):
+    - sqlite3/common
+  - sqlite3/perf-threadsafe (3.45.1):
+    - sqlite3/common
+  - sqlite3/rtree (3.45.1):
+    - sqlite3/common
+  - sqlite3_flutter_libs (0.0.1):
+    - Flutter
+    - sqlite3 (~> 3.45.1)
+    - sqlite3/fts5
+    - sqlite3/perf-threadsafe
+    - sqlite3/rtree
   - thermal_printer (1.0.0):
     - Flutter
 
@@ -11,7 +29,13 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_icmp_ping (from `.symlinks/plugins/flutter_icmp_ping/ios`)
   - network_info_plus (from `.symlinks/plugins/network_info_plus/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
+  - sqlite3_flutter_libs (from `.symlinks/plugins/sqlite3_flutter_libs/ios`)
   - thermal_printer (from `.symlinks/plugins/thermal_printer/ios`)
+
+SPEC REPOS:
+  trunk:
+    - sqlite3
 
 EXTERNAL SOURCES:
   Flutter:
@@ -20,6 +44,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_icmp_ping/ios"
   network_info_plus:
     :path: ".symlinks/plugins/network_info_plus/ios"
+  path_provider_foundation:
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
+  sqlite3_flutter_libs:
+    :path: ".symlinks/plugins/sqlite3_flutter_libs/ios"
   thermal_printer:
     :path: ".symlinks/plugins/thermal_printer/ios"
 
@@ -27,6 +55,9 @@ SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_icmp_ping: 2b159955eee0c487c766ad83fec224ae35e7c935
   network_info_plus: 6d0c3eb8367b8164fa3fb0c19875e3f59d49697f
+  path_provider_foundation: 3784922295ac71e43754bd15e0653ccfd36a147c
+  sqlite3: 73b7fc691fdc43277614250e04d183740cb15078
+  sqlite3_flutter_libs: af0e8fe9bce48abddd1ffdbbf839db0302d72d80
   thermal_printer: 1885c43c3f17b912ca2c29e7f44822dddc2c24b9
 
 PODFILE CHECKSUM: f030c331a1a70409b379e4946484e3ce5e7d4d46

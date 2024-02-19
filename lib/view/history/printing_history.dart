@@ -64,26 +64,26 @@ class _MyWidgetState extends State<PrintingHistory> {
                   child: Column(
                     children: controller.historyData
                         .map((element) => Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Expanded(
-                                  child: Center(
-                                    child: Text(
-                                      element.name.toIso8601String(),
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12.sp),
-                                    ),
+                                  child: Text(
+                                    element.name.toIso8601String(),
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12.sp),
                                   ),
                                 ),
+                                SizedBox(
+                                  width: 2.wp,
+                                ),
                                 Expanded(
-                                  child: Center(
-                                    child: Text(
-                                      element.printerName,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12.sp),
-                                    ),
+                                  child: Text(
+                                    element.printerName,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12.sp),
                                   ),
                                 ),
                               ],

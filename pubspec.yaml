@@ -28,12 +28,11 @@ dependencies:
   lottie: ^3.0.0
   get: ^4.6.6
   flutter_screenutil: ^5.9.0
-  get_storage: ^2.1.1
   sqlite3: ^2.3.0
   path_provider: ^2.1.2
-  drift: ^2.15.0
-  build_runner: ^2.4.8
   sqlite3_flutter_libs: ^0.5.20
+  path: ^1.8.3
+  image: ^4.1.7
   # permission_handler: ^11.2.0
   
 dev_dependencies:
